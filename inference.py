@@ -10,6 +10,7 @@ from datetime import datetime
 import os
 import sys
 import time
+import datetime
 
 from PIL import Image
 
@@ -20,6 +21,7 @@ from deeplab_resnet import DeepLabResNetModel, ImageReader, decode_labels, dense
 
 SAVE_DIR = './output/'
 IMG_MEAN = np.array((104.00698793,116.66876762,122.67891434), dtype=np.float32)
+GPU=1
 
 def get_arguments():
     """Parse all the arguments provided from the CLI.
@@ -54,8 +56,10 @@ def main():
     # Prepare image.
     img_orig = tf.image.decode_jpeg(tf.read_file(args.img_path), channels=3)
     # Convert RGB to BGR.
-    img_r, img_g, img_b = tf.split(split_dim=2, num_split=3, value=img_orig)
-    img = tf.cast(tf.concat(2, [img_b, img_g, img_r]), dtype=tf.float32)
+    #img_r, img_g, img_b = tf.split(split_dim=2, num_split=3, value=img_orig)
+    #img = tf.cast(tf.concat(2, [img_b, img_g, img_r]), dtype=tf.float32)
+    img_r, img_g, img_b = tf.split(img_orig, 3, axis=2)
+    img = tf.cast(tf.concat([img_b, img_g, img_r], 2), dtype=tf.float32)
     # Extract mean.
     img -= IMG_MEAN 
     
@@ -78,7 +82,7 @@ def main():
 
     
     # Set up TF session and initialize variables. 
-    config = tf.ConfigProto()
+    config = tf.ConfigProto(device_count = {'GPU': GPU})
     config.gpu_options.allow_growth = True
     sess = tf.Session(config=config)
     init = tf.global_variables_initializer()
@@ -89,8 +93,12 @@ def main():
     loader = tf.train.Saver(var_list=restore_var)
     load(loader, sess, args.model_weights)
     
+    a = datetime.datetime.now()
     # Perform inference.
     preds = sess.run(pred)
+    b = datetime.datetime.now()
+    d = b-a
+    print("inference took "+str(d.microseconds)+"usec")
     
     msk = decode_labels(preds)
     im = Image.fromarray(msk[0])
