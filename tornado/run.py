@@ -46,7 +46,8 @@ class Application(tornado.web.Application):
         handlers = [
             (r"/", IndexHandler),
             (r"/upload", UploadHandler),
-            (r"/result/(.*)", tornado.web.StaticFileHandler, {"path" : "./results"})
+            (r"/result/(.*)", tornado.web.StaticFileHandler, {"path" : "./results"}),
+            (r"/status", StatusHandler)
         ]
         tornado.web.Application.__init__(self, handlers)
         
@@ -70,6 +71,10 @@ class UploadHandler(tornado.web.RequestHandler):
         print("Submitted request " + fileID + " for segmentation processing");
 
         self.finish(hostUrl+"/result/"+fileID+".png")
+
+class StatusHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.finish("ok")
 
 ### DEEPLAB STUFF BELOW
 def load(saver, sess, ckpt_path):
