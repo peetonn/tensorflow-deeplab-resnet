@@ -64,6 +64,7 @@ def main():
     img -= IMG_MEAN 
     
     # Create network.
+    print("create network expand_dims: "+str(img.shape))
     net = DeepLabResNetModel({'data': tf.expand_dims(img, dim=0)}, is_training=False)
 
     # Which variables to load.
