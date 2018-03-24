@@ -9,11 +9,8 @@ This service is built atop [DeepLab-ResNet-TensorFlow](https://github.com/DrSlee
 
 ```
 pip install -r requirements.txt
+pip install tornado
 ```
-
-* download pre-trained weights from [here](https://drive.google.com/drive/folders/0B_rootXHuswsZ0E4Mjh1ZU5xZVU) (author's link) or ask *peter [at] remap [dot] ucla [dot] edu* if original link doesn't work anymore and **save it to the repo directory**;
-
-> **NOTE** `deeplab_resnet.ckpt` should be used.
 
 * in repo directory, create folders:
 
@@ -21,11 +18,9 @@ pip install -r requirements.txt
 mkdir upload results
 ```
 
-* install tornado:
+* download pre-trained weights from [here](https://drive.google.com/drive/folders/0B_rootXHuswsZ0E4Mjh1ZU5xZVU) (author's link) or ask *peter [at] remap [dot] ucla [dot] edu* if original link doesn't work anymore and **save it to the repo directory**;
 
-```
-pip install tornado
-```
+> **NOTE** `deeplab_resnet.ckpt` should be used.
 
 ## Configuration
 
