@@ -59,6 +59,12 @@ class UploadHandler(tornado.web.RequestHandler):
     def post(self):
         print("New upload request "+str(self.request))
 
+        if requestQueue.qsize() > 0:
+            print("Pending request in progress... REPLY 423")
+            self.set_status(423)
+            self.finish("service is not available. try again later")
+            return
+
         fileData = self.request.files['file'][0]
         original_fname = fileData['filename']
         extension = os.path.splitext(original_fname)[1]
@@ -104,8 +110,9 @@ def deeplabProcessing(gpuId):
             break
 
         printWorker("Received request for DL segmentaiton: "+fileId)
+        printWorker("Requests queue size: " + str( requestQueue.qsize()))
 
-        t1 = datetime.datetime.now()
+        t1 = timestampMs() #datetime.datetime.now()
 
         imgPath = os.path.join(uploadPath, fileId)
         # Prepare image.
@@ -169,8 +176,8 @@ def deeplabProcessing(gpuId):
         originalFile = os.path.join(uploadPath,fileId)
         os.remove(originalFile)
 
-        t2 = datetime.datetime.now()
-        printWorker("Processing took "+str((t2-t1).microseconds)+"usec. Result is at "+maskPath)
+        t2 = timestampMs() #datetime.datetime.now()
+        printWorker("Processing took "+str(t2-t1)+"ms. Result is at "+maskPath)
 
 def signal_handler(signum, frame):
     global is_closing
