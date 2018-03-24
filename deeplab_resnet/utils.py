@@ -3,6 +3,7 @@ import numpy as np
 import tensorflow as tf
 import pydensecrf.densecrf as dcrf
 
+n_classes = 21
 # colour map
 label_colours = [(0,0,0)
                 # 0=background
