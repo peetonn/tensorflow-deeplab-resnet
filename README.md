@@ -4,14 +4,14 @@ This service is built atop [DeepLab-ResNet-TensorFlow](https://github.com/DrSlee
 
 ## Dependencies
 
-* install [TensorFlow](https://www.tensorflow.org/install/install_linux) (as of 3/17/2018 during production, was running with TensorFlow 1.5.0)
+* install [TensorFlow](https://www.tensorflow.org/install/install_linux) (as of 3/17/2018 production, TensorFlow 1.5.0 was used)
 * install requirements:
 
 ```
 pip install -r requirements.txt
 ```
 
-* download pre-trained wieghts from [here](https://drive.google.com/drive/folders/0B_rootXHuswsZ0E4Mjh1ZU5xZVU) (author's link) or ask *peter [at] remap [dot] ucla [dot] edu* if original link doesn't work anymore and **save it to the repo directory**;
+* download pre-trained weights from [here](https://drive.google.com/drive/folders/0B_rootXHuswsZ0E4Mjh1ZU5xZVU) (author's link) or ask *peter [at] remap [dot] ucla [dot] edu* if original link doesn't work anymore and **save it to the repo directory**;
 
 > **NOTE** `deeplab_resnet.ckpt` should be used.
 
