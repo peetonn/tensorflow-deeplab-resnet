@@ -14,8 +14,10 @@ import time
 
 import tensorflow as tf
 import numpy as np
+from tqdm import tqdm
 
-from deeplab_resnet import DeepLabResNetModel, ImageReader, prepare_label
+from deeplab_resnet import DeepLabResNetModel, ImageReader, dense_crf, inv_preprocess, prepare_label
+
 
 IMG_MEAN = np.array((104.00698793,116.66876762,122.67891434), dtype=np.float32)
 
@@ -88,16 +90,21 @@ def main():
     # Predictions.
     raw_output = net.layers['fc1_voc12']
     raw_output = tf.image.resize_bilinear(raw_output, tf.shape(image_batch)[1:3,])
+    
+    # CRF.
+    inv_image = tf.py_func(inv_preprocess, [image_batch], tf.uint8)
+    raw_output = tf.py_func(dense_crf, [tf.nn.softmax(raw_output), inv_image], tf.float32)
+    
     raw_output = tf.argmax(raw_output, dimension=3)
-    pred = tf.expand_dims(raw_output, dim=3) # Create 4-d tensor.
+    pred = tf.expand_dims(raw_output, dim=3) # Create a 4-d tensor.
     
     # mIoU
     pred = tf.reshape(pred, [-1,])
     gt = tf.reshape(label_batch, [-1,])
-    weights = tf.cast(tf.less_equal(gt, args.num_classes - 1), tf.int32) # Ignoring all labels greater than or equal to n_classes.
-    mIoU, update_op = tf.contrib.metrics.streaming_mean_iou(pred, gt, num_classes=args.num_classes, weights=weights)
+    weights = tf.cast(tf.less_equal(gt, 20), tf.int32) # Ignore the void label '255'.
+    mIoU, update_op = tf.contrib.metrics.streaming_mean_iou(pred, gt, num_classes=21, weights=weights)
     
-    # Set up tf session and initialize variables. 
+    # Set up a TF session and initialise variables. 
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
     sess = tf.Session(config=config)
@@ -115,10 +122,8 @@ def main():
     threads = tf.train.start_queue_runners(coord=coord, sess=sess)
     
     # Iterate over training steps.
-    for step in range(args.num_steps):
+    for step in tqdm(range(args.num_steps)):
         preds, _ = sess.run([pred, update_op])
-        if step % 100 == 0:
-            print('step {:d}'.format(step))
     print('Mean IoU: {:.3f}'.format(mIoU.eval(session=sess)))
     coord.request_stop()
     coord.join(threads)
