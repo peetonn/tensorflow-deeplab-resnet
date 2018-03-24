@@ -74,11 +74,11 @@ def upload(fname):
 		maxWait = 2000
 		while statusCode != 200 and it < maxIter:
 			print("Fetching result "+str(it+1)+"/"+str(maxIter)+"...")
-			r = requests.get("http://127.0.0.1:8888/result/fabd1020-a705-463d-b386-c60048d20c1a", stream=True)
+			r = requests.get(response.text, stream=True)
 			statusCode = r.status_code
 			it += 1
 			if statusCode != 200:
-				sleep(float(maxWait)/float(maxIter))
+				sleep(float(maxWait)/float(maxIter)/1000)
 
 		if statusCode == 200:
 			fname = "./result.png"
@@ -90,8 +90,7 @@ def upload(fname):
 			print("time out receiving result from the server")
 
 def main():
-	upload("/Users/peetonn/Downloads/img12.png")
+	upload("./sample420x236.jpg")
 
 if __name__ == "__main__":
-	main()
-```
+	main()```
